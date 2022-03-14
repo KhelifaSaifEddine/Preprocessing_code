@@ -1,0 +1,40 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Mar 12 07:45:27 2022
+
+@author: kheli
+"""
+import Visual ###dont delete this###
+import pandas
+import glob
+%matplotlib inline
+import Prepocessing_methods1 as methods
+import system_methods as systems
+
+
+#####################################################################################################################
+#this block if you want to see scans before any preprocessing change path to desired path of the .dcm files
+#path = "C:/Users/kheli/Desktop/Data/HNSCC/HNSCC-01-0216/08-10-2008-002-78118/2.000000-CONTRAST120CC3CCS90S DELAY-73892/"
+#Visual.show_alone(path) 
+#########################################################################################################################
+
+
+############# Retreive the patients codes ################
+df = pandas.read_csv("labels.csv")
+list = df.sort_values(by ="TCIA Radiomics ID" )["TCIA Radiomics ID"].values
+list = list[80:]
+path_for_gifs = "./GIFS" ###to check histogram and gif for the volume ####
+path_for_output = "./Preprocessed_npz_files" ###the preprocessed dataset####
+path_for_data_input = "C:/Users/kheli/Desktop/Data/HNSCC/" ###the original dataset####
+
+for idx,patient_name in enumerate(list):
+    try:
+        path = glob.glob(path_for_data_input+ patient_name, recursive=True)
+        dcm__patient = systems.recur_f(path,[])
+        s = methods.CleanCTScans("testing",dcm__patient,path_for_gifs,patient_name,path_for_output)
+        break
+    except Exception:
+        print(patient_name) ### some patients may considred useless because of some necessary attributes that are missing ######
+        pass
+
+###############################################################
